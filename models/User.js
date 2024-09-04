@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import jwt from "jsonwebtoken";
 
 const userSchema = new mongoose.Schema({
     avatar: {
@@ -32,5 +33,8 @@ const userSchema = new mongoose.Schema({
 }, {timestamps: true})
 
 
+userSchema.methods.generateJWT = async function(){
+    return await jwt.sign({id: this._id}, process.env.JWT_SECRET);
+}
 
 export default mongoose.model("User", userSchema)
