@@ -1,5 +1,7 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
+import fileRemover from "../utils/FileRemover.js";
+import uploadPicture from "../Middleware/uploadProfilePicturemiddleware.js";
 
 export const registerUser = async (req, res, next) => {
   try {
@@ -124,6 +126,51 @@ export const updateProfile = async (req, res, next) => {
 
 export const updateProfilePicture = async (req, res, next) => {
   try {
+    const upload = uploadPicture.single("profilePicture")
+
+
+    upload(req,res, async function (err){
+      if(err){
+        const error = new Error("An Unknown Erro Occured When Uploading")
+        next(error)
+      }else{
+        if(req.file){
+          let filename;
+          let updatedUser = await User.findById(req.user._id)
+          filename = updatedUser.avatar
+          if(filename){
+            fileRemover(filename)
+          }
+          updatedUser.avatar = req.file.filename
+          await updatedUser.save()
+        res.json({
+          _id: updatedUser._id,
+          name: updatedUser.name,
+          email: updatedUser.email,
+          avatar: updatedUser.avatar,
+          verified: updatedUser.verified,
+          admin: updatedUser.admin,
+          token: await updatedUser.generateJWT(),    
+        })
+        }else{
+          let filename;
+          let updateUser = await User.findById(req.user._id)  
+          filename = updateUser.avatar
+          updateUser.avatar = ""
+          await updateUser.save()
+          fileRemover(filename)
+          res.json({
+            _id: updateUser._id,
+            name: updateUser.name,
+            email: updateUser.email,
+            avatar: updateUser.avatar,
+            verified: updateUser.verified,
+            admin: updateUser.admin,
+            token: await updateUser.generateJWT(),      
+          })
+        }
+      }
+    })
   } catch (error) {
     next(error);
   }
