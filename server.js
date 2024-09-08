@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./Config/db.js";
 import userRoutes from "./Routes/userRoutes.js"
+import postRoutes from "./Routes/Postroutes.js"
 import cors from "cors"
 import path from "path"
 import { ErrorResponseHandler, InvalidPathHandler } from "./Middleware/errorHandler.js";
@@ -25,6 +26,7 @@ app.get("/", (req, res) => {
 })
 
 app.use("/api/users", userRoutes);
+app.use("api/posts", postRoutes)
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
