@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
 import Post  from "../models/Post.js";
 import {v4 as uuidv4} from "uuid";
+import Comment from "../models/Comment.js"
+import Comment from "../models/Comment.js";
 export const createPost = async (req, res, next) => {
   try {
     const post = new Post({
@@ -76,6 +78,49 @@ export const updatePost = async (req, res, next) => {
       next(error);
     }
   };
-  
-  
 
+
+  export const deletePost = async (req,res, next) => {
+    try {
+        const post = await Post.findOneAndDelete({slug: req.params.slug})
+        if(!post){
+            const error = new Error("Post was not found")
+            return next(error)
+        }
+        
+        await Comment.deleteMany({post: post._id})
+
+        return res.json({
+            message: "Post was deleted successfully"
+        })
+    } catch (error) {
+        next(error)
+    }
+  }
+  
+  
+export const getPost = async (req, res, next) => {
+    try {
+        const post =  await Post.findOne({slug: req.params.slug}).populate([
+            {
+                path: "user",
+                select: ["name", "avatar"]
+            },
+            {
+                path: "Comment",
+                match: {
+                    check: true,
+                    parent: null
+                }
+            }
+        ])
+        if(!post){
+            const error = new Error("Post was not found")
+            return next(error)
+        }
+
+        return res.json(post)
+    } catch (error) {
+        next(error)
+    }
+}
