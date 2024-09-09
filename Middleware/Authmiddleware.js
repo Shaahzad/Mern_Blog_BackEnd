@@ -10,6 +10,7 @@ export const AuthGuard = async (req, res, next) => {
             next();
             
         } catch (error) {
+            console.log(error);
             const err = new Error("Not authorized, Token Failed");
             err.statusCode = 401;
             next(err);
@@ -23,6 +24,7 @@ export const AuthGuard = async (req, res, next) => {
 
 
 export const adminGuard =  (req, res, next) => {
+console.log(req.user)
 if(req.user && req.user.admin){
     next();
 }else{

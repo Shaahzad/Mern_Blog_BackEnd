@@ -30,7 +30,7 @@ const PostSchema = new mongoose.Schema({
         type: [String],
     },
     categories: [{type: mongoose.Schema.Types.ObjectId, ref: "Postcategories"}],
-}, {timestamps: true})
+}, {timestamps: true, toJSON: {virtuals: true}})
 
 
 

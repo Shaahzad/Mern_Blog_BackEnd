@@ -17,7 +17,7 @@ const CommentSchema = new mongoose.Schema({
         default: null
     }
 
-}, {timestamps: true})
+}, {timestamps: true, toJSON: {virtuals: true}})
 
 
 

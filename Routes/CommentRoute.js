@@ -1,9 +1,9 @@
 import express from "express"
 const router = express.Router()
-import {  } from "../Controllers/CommentController.js"
-import {AuthGuard, adminGuard} from "../Middleware/Authmiddleware.js"
+import { createComment } from "../Controllers/CommentController.js"
+import {AuthGuard} from "../Middleware/Authmiddleware.js"
 
-router.post("/", AuthGuard, adminGuard, createPost)
+router.post("/", AuthGuard, createComment)
 
 
 export default router
