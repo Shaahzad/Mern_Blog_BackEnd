@@ -133,7 +133,7 @@ export const getPost = async (req, res, next) => {
 
 export const getAllpost = async (req, res, next) => {
   try {
-    const post = await Post.dind({}).populate([{ path: "user", select: ["avatar", "name", "verified"] }]);
+    const post = await Post.find({}).populate([{ path: "user", select: ["avatar", "name", "verified"] }]);
     res.json(post);
   } catch (error) {
   next(error);
