@@ -133,8 +133,40 @@ export const getPost = async (req, res, next) => {
 
 export const getAllpost = async (req, res, next) => {
   try {
-    const post = await Post.find({}).populate([{ path: "user", select: ["avatar", "name", "verified"] }]);
-    res.json(post);
+    const filter = req.query.searchKeyword
+    let where = {}
+    if(filter){
+      where.Title = {$regex: filter, $options: 'i'}
+    }
+
+    let query =  Post.find(where)
+    const page = parseInt(req.query.page) || 1;
+    const pagesize = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * pagesize;
+    const total = await Post.countDocuments();
+    const pages = Math.ceil(total / pagesize);
+
+    if(page > pages){
+      const error = new Error("Page not found");
+      return next(error);
+    }
+    const result = query.skip(skip).limit(pagesize).populate([
+      {
+        path: "user",
+        select: ['avatar', 'name', 'verified']
+      }
+    ]).sort({updatedAt: "desc"})
+
+
+    req.header({
+      "x-filter": filter,
+       "x-totalcount": JSON.stringify(total),
+       "x-currentpage": JSON.stringify(page),
+       "x-pagesize": JSON.stringify(pagesize),
+       "x-totalpagecount": JSON.stringify(pages),
+    })
+
+    return res.json(result);
   } catch (error) {
   next(error);
   }
